@@ -420,11 +420,265 @@
             animation: pop 0.3s ease;
         }
 
+
+        /* ===== 弹窗/遮罩层 ===== */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.45);
+            backdrop-filter: blur(4px);
+            z-index: 100;
+            display: none;
+            align-items: flex-end;
+            justify-content: center;
+            animation: fadeIn 0.2s ease;
+        }
+        .modal-overlay.show {
+            display: flex;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .modal-content {
+            background: rgba(255,255,255,0.97);
+            backdrop-filter: blur(16px);
+            width: 100%;
+            max-width: 480px;
+            max-height: 85vh;
+            border-radius: 24px 24px 0 0;
+            padding: 20px 16px 30px;
+            overflow-y: auto;
+            animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(0,0,0,0.06);
+        }
+        .modal-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+        .modal-close {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.05);
+            border: none;
+            font-size: 18px;
+            color: #64748b;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ===== 历史记录列表 ===== */
+        .history-date-group {
+            margin-bottom: 14px;
+        }
+        .history-date-header {
+            font-size: 13px;
+            font-weight: 700;
+            color: #7c3aed;
+            background: rgba(243,232,255,0.6);
+            padding: 6px 12px;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .history-date-header .score {
+            color: #16a34a;
+            font-weight: 600;
+        }
+        .history-item-row {
+            display: flex;
+            align-items: center;
+            padding: 8px 10px;
+            border-radius: 10px;
+            margin: 3px 0;
+            font-size: 13px;
+            background: rgba(0,0,0,0.02);
+        }
+        .history-item-row .dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            margin-right: 10px;
+            flex-shrink: 0;
+        }
+        .history-item-row .dot.positive { background: #22c55e; }
+        .history-item-row .dot.negative { background: #ef4444; }
+        .history-item-row .dot.offset { background: #3b82f6; }
+        .history-item-row .text {
+            flex: 1;
+            color: #475569;
+        }
+        .history-item-row .item-score-tag {
+            font-size: 12px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 8px;
+        }
+        .history-item-row .item-score-tag.pos { background: #dcfce7; color: #16a34a; }
+        .history-item-row .item-score-tag.neg { background: #fee2e2; color: #dc2626; }
+        .history-empty {
+            text-align: center;
+            padding: 40px 20px;
+            color: #94a3b8;
+            font-size: 14px;
+        }
+        .history-empty .emoji { font-size: 40px; margin-bottom: 10px; display: block; }
+
+        /* ===== 日历视图 ===== */
+        .calendar-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+        .calendar-nav button {
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(0,0,0,0.05);
+            font-size: 16px;
+            cursor: pointer;
+            color: #475569;
+        }
+        .calendar-nav .month-label {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 6px;
+            text-align: center;
+        }
+        .calendar-weekday {
+            font-size: 11px;
+            font-weight: 600;
+            color: #94a3b8;
+            padding: 6px 0;
+        }
+        .calendar-day {
+            aspect-ratio: 1;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 600;
+            color: #334155;
+            background: rgba(0,0,0,0.03);
+            cursor: pointer;
+            transition: all 0.15s;
+            position: relative;
+        }
+        .calendar-day:active { transform: scale(0.92); }
+        .calendar-day.other-month { color: #cbd5e1; background: transparent; }
+        .calendar-day.today {
+            border: 2px solid #7c3aed;
+            color: #7c3aed;
+        }
+        .calendar-day .day-score {
+            font-size: 9px;
+            font-weight: 500;
+            margin-top: 2px;
+        }
+        .calendar-day .day-dot {
+            width: 4px; height: 4px;
+            border-radius: 50%;
+            position: absolute;
+            top: 4px; right: 4px;
+        }
+        .calendar-day .day-dot.has-penalty { background: #ef4444; }
+        .calendar-day .day-dot.has-mission { background: #a855f7; }
+
+        /* 得分颜色梯度 */
+        .score-0 { background: rgba(0,0,0,0.03) !important; }
+        .score-1 { background: rgba(34,197,94,0.08) !important; color: #15803d !important; }
+        .score-2 { background: rgba(34,197,94,0.18) !important; color: #15803d !important; }
+        .score-3 { background: rgba(34,197,94,0.30) !important; color: #14532d !important; }
+        .score-4 { background: rgba(34,197,94,0.45) !important; color: #14532d !important; }
+        .score-5 { background: rgba(34,197,94,0.60) !important; color: white !important; }
+        .score-6 { background: rgba(34,197,94,0.75) !important; color: white !important; }
+        .score-7 { background: rgba(34,197,94,0.90) !important; color: white !important; }
+        .score-8 { background: linear-gradient(135deg, #22c55e, #16a34a) !important; color: white !important; }
+
+        .calendar-legend {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 14px;
+            font-size: 11px;
+            color: #64748b;
+        }
+        .calendar-legend .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .calendar-legend .legend-box {
+            width: 14px; height: 14px;
+            border-radius: 4px;
+        }
+
+        /* 日历详情弹窗 */
+        .day-detail {
+            background: rgba(243,232,255,0.5);
+            border-radius: 14px;
+            padding: 14px;
+            margin-top: 14px;
+            font-size: 13px;
+        }
+        .day-detail .detail-title {
+            font-weight: 700;
+            color: #5b21b6;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        .day-detail .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+            color: #475569;
+        }
+
+        /* 新增按钮组 */
+        .btn-group-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .btn-ghost {
+            background: rgba(255,255,255,0.85);
+            color: #7c3aed;
+            border: 2px solid #ddd6fe;
+        }
+
         @media (max-width: 380px) {
             .score-card .value { font-size: 22px; }
             .header h1 { font-size: 20px; }
         }
+
     </style>
+<base target="_blank">
 <base target="_blank">
 </head>
 <body>
@@ -626,6 +880,10 @@
         <div class="btn-group">
             <button class="btn btn-primary" onclick="copyReport()">📋 复制今日汇报</button>
             <button class="btn btn-secondary" onclick="resetDay()">🔄 重置今日</button>
+        </div>
+        <div class="btn-group-2">
+            <button class="btn btn-ghost" onclick="showHistory()">📜 历史记录</button>
+            <button class="btn btn-ghost" onclick="showCalendar()">📅 日历视图</button>
         </div>
 
         <div style="height: 40px;"></div>
@@ -932,6 +1190,272 @@ function copyReport() {
 }
 
 updateDate(); updatePhaseDisplay(); loadData();
+
+// ==================== 历史记录功能 ====================
+function showHistory() {
+    const modal = document.getElementById('historyModal');
+    const content = document.getElementById('historyContent');
+    const records = data.records || {};
+    const dates = Object.keys(records).sort().reverse();
+
+    if (dates.length === 0) {
+        content.innerHTML = '<div class="history-empty"><span class="emoji">📝</span>还没有打卡记录哦~<br>快去打卡吧！</div>';
+        modal.classList.add('show');
+        document.body.style.overflow = 'hidden';
+        return;
+    }
+
+    let html = '';
+    dates.forEach(date => {
+        const r = records[date];
+        let dayScore = 0;
+        let items = [];
+
+        // 每日项
+        for (let key in r.items) {
+            const s = r.items[key];
+            items.push({ text: key, score: s });
+            if (s > 0 && key !== '打扫全屋一次' && key !== '连续三天独立做饭+刷碗') dayScore += s;
+            if (s < 0) dayScore += s; // 惩罚分也算在当日
+        }
+        dayScore += r.studyScore || 0;
+
+        // 按分数排序：正分在前，负分在后
+        items.sort((a, b) => b.score - a.score);
+
+        html += `<div class="history-date-group">`;
+        html += `<div class="history-date-header">📅 ${date}<span class="score">当日 ${dayScore >= 0 ? '+' : ''}${dayScore} 分</span></div>`;
+
+        if (items.length === 0 && !r.studyHours) {
+            html += `<div style="padding:8px 10px;color:#94a3b8;font-size:13px;">当天未打卡</div>`;
+        } else {
+            items.forEach(it => {
+                let dotClass = it.score > 0 ? 'positive' : (it.score < 0 ? 'negative' : 'offset');
+                let tagClass = it.score > 0 ? 'pos' : 'neg';
+                let scoreText = it.score > 0 ? '+' + it.score : String(it.score);
+                html += `<div class="history-item-row">
+                    <div class="dot ${dotClass}"></div>
+                    <span class="text">${it.text}</span>
+                    <span class="item-score-tag ${tagClass}">${scoreText}</span>
+                </div>`;
+            });
+            if (r.studyHours) {
+                html += `<div class="history-item-row">
+                    <div class="dot positive"></div>
+                    <span class="text">学习时长 ${r.studyHours}h</span>
+                    <span class="item-score-tag pos">+${r.studyScore}</span>
+                </div>`;
+            }
+        }
+        html += `</div>`;
+    });
+
+    content.innerHTML = html;
+    modal.classList.add('show');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeHistory(e) {
+    if (e.target === e.currentTarget) closeHistoryDirect();
+}
+function closeHistoryDirect() {
+    document.getElementById('historyModal').classList.remove('show');
+    document.body.style.overflow = '';
+}
+
+// ==================== 日历视图功能 ====================
+let calendarCurrentDate = new Date();
+let calendarSelectedDate = null;
+
+function showCalendar() {
+    calendarCurrentDate = new Date();
+    calendarSelectedDate = null;
+    renderCalendar();
+    document.getElementById('calendarModal').classList.add('show');
+    document.body.style.overflow = 'hidden';
+    document.getElementById('calendarDayDetail').innerHTML = '';
+}
+
+function closeCalendar(e) {
+    if (e.target === e.currentTarget) closeCalendarDirect();
+}
+function closeCalendarDirect() {
+    document.getElementById('calendarModal').classList.remove('show');
+    document.body.style.overflow = '';
+}
+
+function changeCalendarMonth(delta) {
+    calendarCurrentDate.setMonth(calendarCurrentDate.getMonth() + delta);
+    renderCalendar();
+    document.getElementById('calendarDayDetail').innerHTML = '';
+}
+
+function getDayScore(dateStr) {
+    const r = data.records[dateStr];
+    if (!r) return { score: 0, hasPenalty: false, hasMission: false, items: [] };
+    let score = 0;
+    let hasPenalty = false;
+    let items = [];
+    for (let key in r.items) {
+        const s = r.items[key];
+        items.push({ text: key, score: s });
+        if (s > 0 && key !== '打扫全屋一次' && key !== '连续三天独立做饭+刷碗') score += s;
+        if (s < 0) { score += s; hasPenalty = true; }
+    }
+    score += r.studyScore || 0;
+    // 检查当天是否有阶段任务完成（通过completedMissions的date匹配）
+    let hasMission = false;
+    for (let pid in data.completedMissions) {
+        if (data.completedMissions[pid].date === dateStr) hasMission = true;
+    }
+    return { score, hasPenalty, hasMission, items, studyHours: r.studyHours || 0, studyScore: r.studyScore || 0 };
+}
+
+function renderCalendar() {
+    const year = calendarCurrentDate.getFullYear();
+    const month = calendarCurrentDate.getMonth();
+    const label = document.getElementById('calendarMonthLabel');
+    label.textContent = `${year}年${month + 1}月`;
+
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const startOffset = firstDay.getDay(); // 0=周日
+    const daysInMonth = lastDay.getDate();
+    const prevLastDay = new Date(year, month, 0).getDate();
+
+    const grid = document.getElementById('calendarGrid');
+    let html = '';
+
+    // 星期标题
+    const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
+    weekdays.forEach(d => html += `<div class="calendar-weekday">${d}</div>`);
+
+    // 上个月的尾巴
+    for (let i = startOffset - 1; i >= 0; i--) {
+        const day = prevLastDay - i;
+        html += `<div class="calendar-day other-month">${day}</div>`;
+    }
+
+    // 当月
+    const todayStr = new Date().toISOString().split('T')[0];
+    for (let day = 1; day <= daysInMonth; day++) {
+        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        const info = getDayScore(dateStr);
+        const isToday = dateStr === todayStr;
+
+        // 根据得分确定颜色等级 (0-50分映射到 0-8)
+        let scoreClass = 'score-0';
+        if (info.score > 0) {
+            const level = Math.min(8, Math.ceil(info.score / 7));
+            scoreClass = `score-${level}`;
+        }
+        if (info.score < 0) scoreClass = 'score-0'; // 负分显示为灰色
+
+        html += `<div class="calendar-day ${scoreClass} ${isToday ? 'today' : ''}" onclick="showDayDetail('${dateStr}')">`;
+        html += `${day}`;
+        if (info.score !== 0) {
+            html += `<span class="day-score">${info.score > 0 ? '+' : ''}${info.score}</span>`;
+        }
+        if (info.hasPenalty) html += `<span class="day-dot has-penalty"></span>`;
+        if (info.hasMission) html += `<span class="day-dot has-mission"></span>`;
+        html += `</div>`;
+    }
+
+    // 下个月的头
+    const totalCells = startOffset + daysInMonth;
+    const remaining = (7 - (totalCells % 7)) % 7;
+    for (let day = 1; day <= remaining; day++) {
+        html += `<div class="calendar-day other-month">${day}</div>`;
+    }
+
+    grid.innerHTML = html;
+}
+
+function showDayDetail(dateStr) {
+    calendarSelectedDate = dateStr;
+    const info = getDayScore(dateStr);
+    const container = document.getElementById('calendarDayDetail');
+
+    if (info.score === 0 && info.items.length === 0 && !info.studyHours) {
+        container.innerHTML = `<div class="day-detail"><div class="detail-title">📅 ${dateStr}</div><div style="color:#94a3b8;padding:10px 0;">当天没有打卡记录</div></div>`;
+        return;
+    }
+
+    let html = `<div class="day-detail"><div class="detail-title">📅 ${dateStr} · 当日得分 ${info.score >= 0 ? '+' : ''}${info.score}</div>`;
+
+    if (info.studyHours) {
+        html += `<div class="detail-row"><span>📚 学习时长</span><span style="color:#16a34a;font-weight:600;">${info.studyHours}h (+${info.studyScore})</span></div>`;
+    }
+
+    info.items.sort((a, b) => b.score - a.score);
+    info.items.forEach(it => {
+        const color = it.score > 0 ? '#16a34a' : (it.score < 0 ? '#dc2626' : '#3b82f6');
+        const sign = it.score > 0 ? '+' : '';
+        html += `<div class="detail-row"><span>${it.text}</span><span style="color:${color};font-weight:600;">${sign}${it.score}</span></div>`;
+    });
+
+    // 检查阶段任务
+    for (let pid in data.completedMissions) {
+        const m = data.completedMissions[pid];
+        if (m.date === dateStr) {
+            html += `<div class="detail-row" style="margin-top:8px;padding-top:8px;border-top:1px dashed rgba(0,0,0,0.1);"><span>🎉 ${m.phaseName}完成</span><span style="color:#a855f7;font-weight:600;">+${m.score}</span></div>`;
+        }
+    }
+
+    html += `</div>`;
+    container.innerHTML = html;
+}
+
+// 触摸滑动关闭弹窗
+document.addEventListener('touchstart', function(e) {
+    window._touchStartY = e.touches[0].clientY;
+});
+document.addEventListener('touchend', function(e) {
+    const dy = e.changedTouches[0].clientY - (window._touchStartY || 0);
+    if (dy > 120) {
+        const historyModal = document.getElementById('historyModal');
+        const calendarModal = document.getElementById('calendarModal');
+        if (historyModal.classList.contains('show')) closeHistoryDirect();
+        if (calendarModal.classList.contains('show')) closeCalendarDirect();
+    }
+});
+
+
 </script>
+
+    <!-- ===== 历史记录弹窗 ===== -->
+    <div class="modal-overlay" id="historyModal" onclick="closeHistory(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <div class="modal-title">📜 历史打卡记录</div>
+                <button class="modal-close" onclick="closeHistoryDirect()">✕</button>
+            </div>
+            <div id="historyContent"></div>
+        </div>
+    </div>
+
+    <!-- ===== 日历视图弹窗 ===== -->
+    <div class="modal-overlay" id="calendarModal" onclick="closeCalendar(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <div class="modal-title">📅 日历视图</div>
+                <button class="modal-close" onclick="closeCalendarDirect()">✕</button>
+            </div>
+            <div class="calendar-nav">
+                <button onclick="changeCalendarMonth(-1)">◀</button>
+                <div class="month-label" id="calendarMonthLabel"></div>
+                <button onclick="changeCalendarMonth(1)">▶</button>
+            </div>
+            <div class="calendar-grid" id="calendarGrid"></div>
+            <div class="calendar-legend">
+                <div class="legend-item"><div class="legend-box" style="background:rgba(0,0,0,0.03)"></div>未打卡</div>
+                <div class="legend-item"><div class="legend-box" style="background:rgba(34,197,94,0.3)"></div>少量</div>
+                <div class="legend-item"><div class="legend-box" style="background:rgba(34,197,94,0.75)"></div>中等</div>
+                <div class="legend-item"><div class="legend-box" style="background:linear-gradient(135deg,#22c55e,#16a34a)"></div>满分</div>
+            </div>
+            <div id="calendarDayDetail"></div>
+        </div>
+    </div>
+
 </body>
 </html>
