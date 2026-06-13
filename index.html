@@ -6,26 +6,82 @@
     <title>每日积分打卡</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        /* 清爽背景 - 淡蓝白渐变 */
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', sans-serif;
-            background: #f5f7fa;
+            background: linear-gradient(180deg, #f0f9ff 0%, #e0f2fe 30%, #f0f9ff 60%, #f8fafc 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* 清爽装饰 - 淡色小圆点和线条 */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(147, 197, 253, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(167, 243, 208, 0.12) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(253, 230, 138, 0.08) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* 漂浮小装饰 */
+        .floating-deco {
+            position: fixed;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.15;
+            animation: float 10s ease-in-out infinite;
+        }
+        .floating-deco:nth-child(1) { top: 8%; left: 5%; animation-delay: 0s; }
+        .floating-deco:nth-child(2) { top: 20%; right: 8%; animation-delay: 2s; }
+        .floating-deco:nth-child(3) { top: 40%; left: 3%; animation-delay: 4s; }
+        .floating-deco:nth-child(4) { top: 55%; right: 5%; animation-delay: 1s; }
+        .floating-deco:nth-child(5) { top: 72%; left: 8%; animation-delay: 3s; }
+        .floating-deco:nth-child(6) { top: 85%; right: 10%; animation-delay: 5s; }
+        .floating-deco:nth-child(7) { top: 15%; left: 85%; animation-delay: 6s; }
+        .floating-deco:nth-child(8) { top: 60%; left: 90%; animation-delay: 7s; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            33% { transform: translateY(-12px) rotate(3deg); }
+            66% { transform: translateY(-6px) rotate(-2deg); }
+        }
+
+        /* 内容容器 */
+        .container {
+            position: relative;
+            z-index: 1;
             padding: 16px;
             max-width: 480px;
             margin: 0 auto;
         }
+
         .header {
             text-align: center;
             padding: 20px 0;
         }
         .header h1 {
-            font-size: 22px;
-            color: #2c3e50;
+            font-size: 24px;
+            color: #1e293b;
             margin-bottom: 8px;
+            font-weight: 700;
         }
         .date-display {
             font-size: 14px;
-            color: #7f8c8d;
+            color: #64748b;
+            background: rgba(255,255,255,0.7);
+            display: inline-block;
+            padding: 5px 14px;
+            border-radius: 20px;
+            backdrop-filter: blur(8px);
         }
+
         .score-board {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -33,89 +89,103 @@
             margin: 16px 0;
         }
         .score-card {
-            background: white;
-            border-radius: 12px;
+            background: rgba(255,255,255,0.85);
+            backdrop-filter: blur(12px);
+            border-radius: 16px;
             padding: 14px;
             text-align: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            border: 1px solid rgba(255,255,255,0.8);
+            transition: transform 0.2s;
         }
+        .score-card:active { transform: scale(0.97); }
         .score-card .label {
             font-size: 12px;
-            color: #95a5a6;
+            color: #94a3b8;
             margin-bottom: 4px;
+            font-weight: 500;
         }
         .score-card .value {
-            font-size: 24px;
-            font-weight: 700;
-            color: #e74c3c;
+            font-size: 26px;
+            font-weight: 600;
+            color: #ef4444;
         }
         .score-card.total .value {
-            color: #27ae60;
+            color: #22c55e;
         }
-        .score-card.penalty-card .value {
-            color: #e74c3c;
-        }
+
         .section {
-            background: white;
-            border-radius: 14px;
-            padding: 16px;
-            margin-bottom: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            background: rgba(255,255,255,0.9);
+            backdrop-filter: blur(12px);
+            border-radius: 18px;
+            padding: 18px;
+            margin-bottom: 14px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+            border: 1px solid rgba(255,255,255,0.8);
         }
         .section-title {
             font-size: 16px;
-            font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 12px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 14px;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
         }
         .section-title .icon {
-            width: 24px;
-            height: 24px;
-            border-radius: 6px;
+            width: 28px;
+            height: 28px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 14px;
+            font-size: 16px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
         }
-        .daily .icon { background: #e8f5e9; color: #27ae60; }
-        .weekly .icon { background: #fff3e0; color: #f39c12; }
-        .penalty .icon { background: #ffebee; color: #e74c3c; }
-        .offset .icon { background: #e3f2fd; color: #2196f3; }
+        .daily .icon { background: #dcfce7; }
+        .weekly .icon { background: #fef3c7; }
+        .penalty .icon { background: #fee2e2; }
+        .offset .icon { background: #dbeafe; }
+        .phase .icon { background: #f3e8ff; }
 
         .item {
             display: flex;
             align-items: center;
-            padding: 10px 0;
-            border-bottom: 1px solid #f0f0f0;
+            padding: 12px 8px;
+            border-bottom: 1px solid rgba(0,0,0,0.04);
             cursor: pointer;
             user-select: none;
             -webkit-tap-highlight-color: transparent;
+            transition: background 0.2s;
+            border-radius: 10px;
+            margin: 2px 0;
         }
         .item:last-child { border-bottom: none; }
-        .item:active { background: #fafafa; }
+        .item:active { background: rgba(0,0,0,0.02); }
 
         .checkbox {
             width: 22px;
             height: 22px;
-            border: 2px solid #bdc3c7;
-            border-radius: 6px;
+            border: 2.5px solid #cbd5e1;
+            border-radius: 8px;
             margin-right: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.2s;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
             flex-shrink: 0;
+            background: white;
         }
         .item.checked .checkbox {
-            background: #27ae60;
-            border-color: #27ae60;
+            background: #22c55e;
+            border-color: #22c55e;
+            transform: scale(1.1);
+            box-shadow: 0 2px 8px rgba(34,197,94,0.25);
         }
         .item.penalty-item.checked .checkbox {
-            background: #e74c3c;
-            border-color: #e74c3c;
+            background: #ef4444;
+            border-color: #ef4444;
+            box-shadow: 0 2px 8px rgba(239,68,68,0.25);
         }
         .checkbox svg {
             width: 14px;
@@ -131,22 +201,25 @@
         .item-text {
             flex: 1;
             font-size: 14px;
-            color: #2c3e50;
-            line-height: 1.4;
+            color: #334155;
+            line-height: 1.5;
         }
         .item.checked .item-text {
             text-decoration: line-through;
-            color: #95a5a6;
+            color: #94a3b8;
         }
 
         .item-score {
             font-size: 14px;
-            font-weight: 600;
+            font-weight: 500;
             margin-left: 8px;
             flex-shrink: 0;
+            padding: 3px 10px;
+            border-radius: 12px;
+            background: rgba(0,0,0,0.03);
         }
-        .score-positive { color: #27ae60; }
-        .score-negative { color: #e74c3c; }
+        .score-positive { color: #16a34a; }
+        .score-negative { color: #dc2626; }
 
         .study-hours {
             display: flex;
@@ -154,284 +227,428 @@
             margin-left: auto;
         }
         .hour-btn {
-            padding: 4px 10px;
-            border-radius: 16px;
-            border: 1px solid #ddd;
+            padding: 5px 12px;
+            border-radius: 20px;
+            border: 2px solid #e2e8f0;
             background: white;
             font-size: 12px;
-            color: #666;
+            color: #64748b;
             cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
         }
         .hour-btn.active {
-            background: #27ae60;
+            background: #22c55e;
             color: white;
-            border-color: #27ae60;
+            border-color: #22c55e;
+            box-shadow: 0 2px 8px rgba(34,197,94,0.25);
         }
 
         .btn-group {
             display: flex;
-            gap: 10px;
-            margin-top: 16px;
+            gap: 12px;
+            margin-top: 18px;
         }
         .btn {
             flex: 1;
-            padding: 14px;
-            border-radius: 12px;
+            padding: 16px;
+            border-radius: 16px;
             border: none;
             font-size: 15px;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
             text-align: center;
+            transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
         }
+        .btn:active { transform: scale(0.96); }
         .btn-primary {
-            background: #27ae60;
+            background: linear-gradient(135deg, #22c55e, #16a34a);
             color: white;
         }
         .btn-secondary {
-            background: #ecf0f1;
-            color: #2c3e50;
+            background: rgba(255,255,255,0.9);
+            color: #334155;
+            border: 2px solid #e2e8f0;
         }
-
-        .penalty-status {
-            background: #ffebee;
-            border-radius: 12px;
-            padding: 14px;
-            margin-bottom: 12px;
-            font-size: 13px;
+        .btn-mission {
+            background: linear-gradient(135deg, #a855f7, #7c3aed);
+            color: white;
+            width: 100%;
+            margin-top: 12px;
+            font-size: 16px;
         }
-        .penalty-status .title {
-            font-weight: 600;
-            color: #e74c3c;
-            margin-bottom: 6px;
+        .btn-mission:disabled {
+            background: #cbd5e1;
+            cursor: not-allowed;
+            box-shadow: none;
+            color: #64748b;
         }
-        .penalty-status .detail {
-            color: #666;
-            line-height: 1.6;
-        }
-        .penalty-status .warning {
-            color: #e74c3c;
-            font-weight: 600;
+        .btn-mission.completed {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
         }
 
         .phase-info {
-            background: #fff8e1;
-            border-radius: 12px;
-            padding: 14px;
-            margin-bottom: 12px;
+            background: rgba(243,232,255,0.85);
+            backdrop-filter: blur(12px);
+            border-radius: 18px;
+            padding: 18px;
+            margin-bottom: 14px;
             font-size: 13px;
-            color: #666;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+            border: 1px solid rgba(255,255,255,0.8);
         }
-        .phase-info strong {
-            color: #f39c12;
+        .phase-info .title {
+            font-weight: 700;
+            color: #7c3aed;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+        .phase-info .date-range {
+            color: #64748b;
+            margin-bottom: 6px;
+            background: rgba(255,255,255,0.6);
+            padding: 4px 12px;
+            border-radius: 12px;
+            display: inline-block;
+        }
+        .phase-info .status {
+            color: #dc2626;
+            font-weight: 700;
+            display: inline-block;
+            padding: 3px 12px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.6);
+        }
+        .phase-info .status.ongoing {
+            color: #16a34a;
+        }
+        .phase-info .status.upcoming {
+            color: #d97706;
+        }
+
+        .mission-result {
+            background: rgba(220,252,231,0.9);
+            border-radius: 14px;
+            padding: 16px;
+            margin-top: 12px;
+            font-size: 14px;
+            display: none;
+            text-align: center;
+            border: 2px solid #86efac;
+        }
+        .mission-result.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .mission-result .bonus {
+            font-size: 28px;
+            font-weight: 600;
+            color: #15803d;
+        }
+        .mission-result .deduction {
+            color: #b91c1c;
+            font-weight: 500;
+            margin-top: 6px;
+            font-size: 15px;
+        }
+
+        .penalty-status {
+            background: rgba(254,226,226,0.85);
+            backdrop-filter: blur(12px);
+            border-radius: 18px;
+            padding: 18px;
+            margin-bottom: 14px;
+            font-size: 13px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+            border: 1px solid rgba(255,255,255,0.8);
+        }
+        .penalty-status .title {
+            font-weight: 700;
+            color: #dc2626;
+            margin-bottom: 8px;
+            font-size: 15px;
+        }
+        .penalty-status .detail {
+            color: #64748b;
+            line-height: 1.7;
+        }
+        .penalty-status .warning {
+            color: #dc2626;
+            font-weight: 600;
+            font-size: 20px;
+        }
+
+        .phase-table {
+            width: 100%;
+            font-size: 12px;
+            border-collapse: separate;
+            border-spacing: 0 4px;
+            margin-top: 10px;
+        }
+        .phase-table th, .phase-table td {
+            padding: 8px 6px;
+            text-align: left;
+        }
+        .phase-table th {
+            color: #7c3aed;
+            font-weight: 700;
+            border-bottom: 2px solid #c4b5fd;
+        }
+        .phase-table td {
+            background: rgba(255,255,255,0.5);
+            border-radius: 8px;
+            color: #475569;
+        }
+        .phase-table .current td {
+            background: rgba(243,232,255,0.7);
+            font-weight: 700;
+            border: 2px solid #c4b5fd;
+            color: #5b21b6;
         }
 
         @keyframes pop {
             0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
+            50% { transform: scale(1.15); }
             100% { transform: scale(1); }
         }
         .item.checked .checkbox {
-            animation: pop 0.2s ease;
+            animation: pop 0.3s ease;
+        }
+
+        @media (max-width: 380px) {
+            .score-card .value { font-size: 22px; }
+            .header h1 { font-size: 20px; }
         }
     </style>
 <base target="_blank">
 </head>
 <body>
-    <div class="header">
-        <h1>🎯 每日积分打卡</h1>
-        <div class="date-display" id="dateDisplay"></div>
-    </div>
+    <!-- 清爽漂浮装饰 -->
+    <div class="floating-deco">🌿</div>
+    <div class="floating-deco">☁️</div>
+    <div class="floating-deco">📚</div>
+    <div class="floating-deco">✨</div>
+    <div class="floating-deco">🌸</div>
+    <div class="floating-deco">💡</div>
+    <div class="floating-deco">📝</div>
+    <div class="floating-deco">🎯</div>
 
-    <div class="phase-info">
-        <strong>📍 第一阶段</strong>：投稿岩土工程学报论文（8周）<br>
-        按计划完成投稿任务 +500分
-    </div>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 每日积分打卡</h1>
+            <div class="date-display" id="dateDisplay"></div>
+        </div>
 
-    <div class="score-board">
-        <div class="score-card">
-            <div class="label">今日得分</div>
-            <div class="value" id="todayScore">0</div>
+        <div class="phase-info" id="phaseInfo">
+            <div class="title" id="phaseTitle"></div>
+            <div class="date-range" id="phaseDate"></div>
+            <div class="status" id="phaseStatus"></div>
+            <table class="phase-table" id="phaseTable"></table>
         </div>
-        <div class="score-card">
-            <div class="label">本周累计</div>
-            <div class="value" id="weekScore">0</div>
-        </div>
-        <div class="score-card">
-            <div class="label">本月累计</div>
-            <div class="value" id="monthScore">0</div>
-        </div>
-        <div class="score-card total">
-            <div class="label">总累计积分</div>
-            <div class="value" id="totalScore">0</div>
-        </div>
-    </div>
 
-    <div class="penalty-status" id="penaltyStatus">
-        <div class="title">⚠️ 惩罚分数（独立计算）</div>
-        <div class="detail">
-            累计惩罚分：<span id="penaltyScore" class="warning">0</span> 分<br>
-            满30分 → 打扫全屋一次<br>
-            满50分 → 连续三天独立做饭+刷碗
+        <div class="section phase" id="missionSection" style="display:none;">
+            <div class="section-title">
+                <span class="icon">📝</span>
+                阶段任务完成
+            </div>
+            <div id="missionContent"></div>
+            <button class="btn btn-mission" id="missionBtn" onclick="completeMission()">
+                按计划完成投稿任务 +500分
+            </button>
+            <div class="mission-result" id="missionResult"></div>
         </div>
-    </div>
 
-    <div class="section daily">
-        <div class="section-title">
-            <span class="icon">✅</span>
-            每日加分项
-        </div>
-        <div class="item" data-score="5" data-type="daily">
-            <div class="checkbox"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
-            <span class="item-text">早上9:00前起床，10:00到办公室</span>
-            <span class="item-score score-positive">+5</span>
-        </div>
-        <div class="item" data-score="5" data-type="daily">
-            <div class="checkbox"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
-            <span class="item-text">晚上12:30前睡觉</span>
-            <span class="item-score score-positive">+5</span>
-        </div>
-        <div class="item" data-score="5" data-type="daily">
-            <div class="checkbox"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
-            <span class="item-text">三餐按时吃（晚餐<9:00pm）</span>
-            <span class="item-score score-positive">+5</span>
-        </div>
-        <div class="item" id="studyItem" data-score="0" data-type="daily">
-            <div class="checkbox"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
-            <span class="item-text">每日学习时长</span>
-            <div class="study-hours">
-                <button class="hour-btn" data-hours="4" data-score="5">4h +5</button>
-                <button class="hour-btn" data-hours="6" data-score="10">6h +10</button>
-                <button class="hour-btn" data-hours="8" data-score="15">8h +15</button>
+        <div class="score-board">
+            <div class="score-card">
+                <div class="label">📅 今日得分</div>
+                <div class="value" id="todayScore">0</div>
+            </div>
+            <div class="score-card">
+                <div class="label">📊 本周累计</div>
+                <div class="value" id="weekScore">0</div>
+            </div>
+            <div class="score-card">
+                <div class="label">📈 本月累计</div>
+                <div class="value" id="monthScore">0</div>
+            </div>
+            <div class="score-card total">
+                <div class="label">🏆 总累计积分</div>
+                <div class="value" id="totalScore">0</div>
             </div>
         </div>
-        <div class="item" data-score="5" data-type="daily">
-            <div class="checkbox"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
-            <span class="item-text">每日记录、复盘</span>
-            <span class="item-score score-positive">+5</span>
-        </div>
-        <div class="item" data-score="5" data-type="daily">
-            <div class="checkbox"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
-            <span class="item-text">每日运动15-20分钟</span>
-            <span class="item-score score-positive">+5</span>
-        </div>
-        <div class="item" data-score="5" data-type="daily">
-            <div class="checkbox"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
-            <span class="item-text">睡前泡脚、护肤、刷牙后不吃</span>
-            <span class="item-score score-positive">+5</span>
-        </div>
-    </div>
 
-    <div class="section weekly">
-        <div class="section-title">
-            <span class="icon">📅</span>
-            每周加分项
+        <div class="penalty-status" id="penaltyStatus">
+            <div class="title">⚠️ 惩罚分数（独立计算）</div>
+            <div class="detail">
+                累计惩罚分：<span id="penaltyScore" class="warning">0</span> 分<br>
+                🧹 满30分 → 打扫全屋一次<br>
+                🍳 满50分 → 连续三天独立做饭+刷碗
+            </div>
         </div>
-        <div class="item" data-score="10" data-type="weekly">
-            <div class="checkbox"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
-            <span class="item-text">论文有进展（小论文一章/大论文2小节）</span>
-            <span class="item-score score-positive">+10</span>
-        </div>
-        <div class="item" data-score="10" data-type="weekly">
-            <div class="checkbox"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
-            <span class="item-text">数模、机器学习有进展（跑通/跑顺）</span>
-            <span class="item-score score-positive">+10</span>
-        </div>
-        <div class="item" data-score="10" data-type="weekly">
-            <div class="checkbox"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
-            <span class="item-text">连续5天学习</span>
-            <span class="item-score score-positive">+10</span>
-        </div>
-        <div class="item" data-score="10" data-type="weekly">
-            <div class="checkbox"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
-            <span class="item-text">连续5天早睡早起</span>
-            <span class="item-score score-positive">+10</span>
-        </div>
-    </div>
 
-    <div class="section penalty">
-        <div class="section-title">
-            <span class="icon">⚠️</span>
-            惩罚扣分项（独立累计）
+        <div class="section daily">
+            <div class="section-title">
+                <span class="icon">✅</span>
+                每日加分项
+            </div>
+            <div class="item" data-score="5" data-type="daily">
+                <div class="checkbox"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+                <span class="item-text">早上9:00前起床，10:00到办公室</span>
+                <span class="item-score score-positive">+5</span>
+            </div>
+            <div class="item" data-score="5" data-type="daily">
+                <div class="checkbox"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+                <span class="item-text">晚上12:30前睡觉</span>
+                <span class="item-score score-positive">+5</span>
+            </div>
+            <div class="item" data-score="5" data-type="daily">
+                <div class="checkbox"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+                <span class="item-text">三餐按时吃（晚餐<9:00pm）</span>
+                <span class="item-score score-positive">+5</span>
+            </div>
+            <div class="item" id="studyItem" data-score="0" data-type="daily">
+                <div class="checkbox"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+                <span class="item-text">每日学习时长</span>
+                <div class="study-hours">
+                    <button class="hour-btn" data-hours="4" data-score="5">4h +5</button>
+                    <button class="hour-btn" data-hours="6" data-score="10">6h +10</button>
+                    <button class="hour-btn" data-hours="8" data-score="15">8h +15</button>
+                </div>
+            </div>
+            <div class="item" data-score="5" data-type="daily">
+                <div class="checkbox"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+                <span class="item-text">每日记录、复盘</span>
+                <span class="item-score score-positive">+5</span>
+            </div>
+            <div class="item" data-score="5" data-type="daily">
+                <div class="checkbox"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+                <span class="item-text">每日运动15-20分钟</span>
+                <span class="item-score score-positive">+5</span>
+            </div>
+            <div class="item" data-score="5" data-type="daily">
+                <div class="checkbox"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+                <span class="item-text">睡前泡脚、护肤、刷牙后不吃</span>
+                <span class="item-score score-positive">+5</span>
+            </div>
         </div>
-        <div class="item penalty-item" data-score="-10" data-type="penalty">
-            <div class="checkbox"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></div>
-            <span class="item-text">熬夜到1:30后</span>
-            <span class="item-score score-negative">-10</span>
-        </div>
-        <div class="item penalty-item" data-score="-10" data-type="penalty">
-            <div class="checkbox"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></div>
-            <span class="item-text">工作日两天未学习</span>
-            <span class="item-score score-negative">-10</span>
-        </div>
-        <div class="item penalty-item" data-score="-10" data-type="penalty">
-            <div class="checkbox"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></div>
-            <span class="item-text">一天刷手机>5h / 玩游戏>3h</span>
-            <span class="item-score score-negative">-10</span>
-        </div>
-        <div class="item penalty-item" data-score="-10" data-type="penalty">
-            <div class="checkbox"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></div>
-            <span class="item-text">连续两天运动未达标</span>
-            <span class="item-score score-negative">-10</span>
-        </div>
-        <div class="item penalty-item" data-score="-30" data-type="penalty">
-            <div class="checkbox"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></div>
-            <span class="item-text">吵架后摔东西、打人</span>
-            <span class="item-score score-negative">-30</span>
-        </div>
-        <div class="item penalty-item" data-score="-30" data-type="penalty">
-            <div class="checkbox"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></div>
-            <span class="item-text">吵架后不说话>2min</span>
-            <span class="item-score score-negative">-30</span>
-        </div>
-        <div class="item penalty-item" data-score="-10" data-type="penalty">
-            <div class="checkbox"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></div>
-            <span class="item-text">3次以上对方不耐烦/强调不注意</span>
-            <span class="item-score score-negative">-10</span>
-        </div>
-    </div>
 
-    <div class="section offset">
-        <div class="section-title">
-            <span class="icon">🔄</span>
-            惩罚抵消项（用于消除惩罚分）
+        <div class="section weekly">
+            <div class="section-title">
+                <span class="icon">📅</span>
+                每周加分项
+            </div>
+            <div class="item" data-score="10" data-type="weekly">
+                <div class="checkbox"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+                <span class="item-text">论文有进展（小论文一章/大论文2小节）</span>
+                <span class="item-score score-positive">+10</span>
+            </div>
+            <div class="item" data-score="10" data-type="weekly">
+                <div class="checkbox"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+                <span class="item-text">数模、机器学习有进展（跑通/跑顺）</span>
+                <span class="item-score score-positive">+10</span>
+            </div>
+            <div class="item" data-score="10" data-type="weekly">
+                <div class="checkbox"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+                <span class="item-text">连续5天学习</span>
+                <span class="item-score score-positive">+10</span>
+            </div>
+            <div class="item" data-score="10" data-type="weekly">
+                <div class="checkbox"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+                <span class="item-text">连续5天早睡早起</span>
+                <span class="item-score score-positive">+10</span>
+            </div>
         </div>
-        <div class="item" data-score="30" data-type="offset">
-            <div class="checkbox"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
-            <span class="item-text">打扫全屋一次</span>
-            <span class="item-score score-positive">+30</span>
-        </div>
-        <div class="item" data-score="50" data-type="offset">
-            <div class="checkbox"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
-            <span class="item-text">连续三天独立做饭+刷碗</span>
-            <span class="item-score score-positive">+50</span>
-        </div>
-    </div>
 
-    <div class="btn-group">
-        <button class="btn btn-primary" onclick="copyReport()">📋 复制今日汇报</button>
-        <button class="btn btn-secondary" onclick="resetDay()">🔄 重置今日</button>
-    </div>
+        <div class="section penalty">
+            <div class="section-title">
+                <span class="icon">⚠️</span>
+                惩罚扣分项（独立累计）
+            </div>
+            <div class="item penalty-item" data-score="-10" data-type="penalty">
+                <div class="checkbox"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></div>
+                <span class="item-text">熬夜到1:30后</span>
+                <span class="item-score score-negative">-10</span>
+            </div>
+            <div class="item penalty-item" data-score="-10" data-type="penalty">
+                <div class="checkbox"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></div>
+                <span class="item-text">工作日两天未学习</span>
+                <span class="item-score score-negative">-10</span>
+            </div>
+            <div class="item penalty-item" data-score="-10" data-type="penalty">
+                <div class="checkbox"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></div>
+                <span class="item-text">一天刷手机>5h / 玩游戏>3h</span>
+                <span class="item-score score-negative">-10</span>
+            </div>
+            <div class="item penalty-item" data-score="-10" data-type="penalty">
+                <div class="checkbox"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></div>
+                <span class="item-text">连续两天运动未达标</span>
+                <span class="item-score score-negative">-10</span>
+            </div>
+            <div class="item penalty-item" data-score="-30" data-type="penalty">
+                <div class="checkbox"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></div>
+                <span class="item-text">吵架后摔东西、打人</span>
+                <span class="item-score score-negative">-30</span>
+            </div>
+            <div class="item penalty-item" data-score="-30" data-type="penalty">
+                <div class="checkbox"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></div>
+                <span class="item-text">吵架后不说话>2min</span>
+                <span class="item-score score-negative">-30</span>
+            </div>
+            <div class="item penalty-item" data-score="-10" data-type="penalty">
+                <div class="checkbox"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></div>
+                <span class="item-text">3次以上对方不耐烦/强调不注意</span>
+                <span class="item-score score-negative">-10</span>
+            </div>
+        </div>
 
-    <div style="height: 40px;"></div>
+        <div class="section offset">
+            <div class="section-title">
+                <span class="icon">🔄</span>
+                惩罚抵消项（用于消除惩罚分）
+            </div>
+            <div class="item" data-score="30" data-type="offset">
+                <div class="checkbox"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+                <span class="item-text">打扫全屋一次</span>
+                <span class="item-score score-positive">+30</span>
+            </div>
+            <div class="item" data-score="50" data-type="offset">
+                <div class="checkbox"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+                <span class="item-text">连续三天独立做饭+刷碗</span>
+                <span class="item-score score-positive">+50</span>
+            </div>
+        </div>
+
+        <div class="btn-group">
+            <button class="btn btn-primary" onclick="copyReport()">📋 复制今日汇报</button>
+            <button class="btn btn-secondary" onclick="resetDay()">🔄 重置今日</button>
+        </div>
+
+        <div style="height: 40px;"></div>
+    </div>
 
 <script>
+// ==================== 阶段配置 ====================
+const PHASES = [
+    { id: 1, name: "第一阶段", task: "投稿岩土工程学报论文", start: "2026-06-14", end: "2026-08-08", weeks: 8, bonus: 500, unlockWeek: 6 },
+    { id: 2, name: "第二阶段", task: "投稿一篇2区以上SCI论文", start: "2026-08-09", end: "2026-10-03", weeks: 8, bonus: 500, unlockWeek: 6 },
+    { id: 3, name: "第三阶段", task: "跑通大论文数模", start: "2026-10-04", end: "2026-11-28", weeks: 8, bonus: 500, unlockWeek: 6 },
+    { id: 4, name: "第四阶段", task: "完成大论文初稿", start: "2026-11-29", end: "2027-02-21", weeks: 12, bonus: 500, unlockWeek: 9 }
+];
+
 let data = JSON.parse(localStorage.getItem('scoreData')) || {
-    records: {},
-    weekScores: {},
-    monthScores: {},
-    totalScore: 0,
-    penaltyScore: 0,
-    currentPhase: 1,
-    phaseStartDate: new Date().toISOString().split('T')[0]
+    records: {}, weekScores: {}, monthScores: {}, totalScore: 0, penaltyScore: 0, completedMissions: {}, currentPhase: 1
 };
 
 const today = new Date().toISOString().split('T')[0];
 const currentWeek = getWeekKey();
 const currentMonth = getMonthKey();
 
-if (!data.records[today]) {
-    data.records[today] = { items: {}, studyHours: 0, studyScore: 0 };
-}
+if (!data.records[today]) data.records[today] = { items: {}, studyHours: 0, studyScore: 0 };
 
 function getWeekKey() {
     const d = new Date();
@@ -440,201 +657,235 @@ function getWeekKey() {
     monday.setDate(d.getDate() - day + 1);
     return monday.toISOString().split('T')[0];
 }
-
 function getMonthKey() {
     const d = new Date();
     return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+}
+function parseDate(str) { return new Date(str + "T00:00:00"); }
+function daysBetween(d1, d2) { return Math.floor((d2 - d1) / (24 * 60 * 60 * 1000)); }
+
+function getCurrentPhase() {
+    const now = new Date(); now.setHours(0,0,0,0);
+    for (let phase of PHASES) {
+        const start = parseDate(phase.start);
+        const end = parseDate(phase.end);
+        end.setHours(23,59,59,999);
+        if (now >= start && now <= end) return phase;
+    }
+    for (let phase of PHASES) { if (now < parseDate(phase.start)) return phase; }
+    return PHASES[PHASES.length - 1];
+}
+
+function getPhaseStatus(phase) {
+    const now = new Date(); now.setHours(0,0,0,0);
+    const start = parseDate(phase.start);
+    const end = parseDate(phase.end);
+    if (now < start) return { status: "upcoming", text: "尚未开始" };
+    if (now > end) return { status: "completed", text: "已结束" };
+    const daysPassed = daysBetween(start, now) + 1;
+    const weekNum = Math.ceil(daysPassed / 7);
+    const totalDays = daysBetween(start, end) + 1;
+    const daysLeft = totalDays - daysPassed;
+    return { status: "ongoing", text: `进行中 · 第${weekNum}周 · 剩余${daysLeft}天`, weekNum: weekNum, daysLeft: daysLeft };
+}
+
+function canClickMission(phase) {
+    const status = getPhaseStatus(phase);
+    return status.status === "ongoing" && status.weekNum >= phase.unlockWeek;
+}
+function isMissionCompleted(phaseId) { return data.completedMissions && data.completedMissions[phaseId]; }
+
+function updatePhaseDisplay() {
+    const phase = getCurrentPhase();
+    const status = getPhaseStatus(phase);
+    document.getElementById('phaseTitle').textContent = `📍 ${phase.name}：${phase.task}`;
+    document.getElementById('phaseDate').textContent = `${phase.start} ~ ${phase.end}（共${phase.weeks}周，第${phase.unlockWeek}周起可提交）`;
+    const statusEl = document.getElementById('phaseStatus');
+    statusEl.textContent = status.text;
+    statusEl.className = 'status ' + status.status;
+
+    let tableHTML = `<tr><th>阶段</th><th>任务</th><th>起止日期</th><th>提交周</th><th>状态</th></tr>`;
+    for (let p of PHASES) {
+        const s = getPhaseStatus(p);
+        const isCurrent = p.id === phase.id;
+        tableHTML += `<tr class="${isCurrent ? 'current' : ''}"><td>${p.name}</td><td>${p.task}</td><td>${p.start}~${p.end}</td><td>第${p.unlockWeek}周</td><td>${s.text}</td></tr>`;
+    }
+    document.getElementById('phaseTable').innerHTML = tableHTML;
+    updateMissionButton(phase);
+}
+
+function updateMissionButton(phase) {
+    const section = document.getElementById('missionSection');
+    const btn = document.getElementById('missionBtn');
+    const content = document.getElementById('missionContent');
+    const result = document.getElementById('missionResult');
+    const status = getPhaseStatus(phase);
+    const completed = isMissionCompleted(phase.id);
+    const canClick = canClickMission(phase);
+
+    if (status.status === "upcoming") { section.style.display = 'none'; return; }
+    section.style.display = 'block';
+
+    if (completed) {
+        const mission = data.completedMissions[phase.id];
+        btn.disabled = true; btn.classList.add('completed');
+        btn.textContent = `✅ ${phase.name}已完成 (+${mission.score}分)`;
+        content.innerHTML = `<div style="color:#64748b;font-size:13px;">完成日期：${mission.date}<br>规定截止：${phase.end}</div>`;
+        result.innerHTML = `<div class="bonus">+${mission.score}分</div>`;
+        if (mission.overdue > 0) result.innerHTML += `<div class="deduction">超期${mission.overdue}天，扣${mission.overdue * 20}分</div>`;
+        result.classList.add('show'); return;
+    }
+
+    if (status.status === "completed") {
+        btn.disabled = false; btn.classList.remove('completed');
+        btn.textContent = `补交：完成${phase.name}任务`;
+        const overdue = Math.max(0, daysBetween(parseDate(phase.end), new Date()));
+        content.innerHTML = `<div style="color:#dc2626;font-size:13px;">⚠️ 阶段已结束${overdue}天，点击计算延期扣分</div>`;
+        result.classList.remove('show'); return;
+    }
+
+    if (canClick) {
+        btn.disabled = false; btn.classList.remove('completed');
+        btn.textContent = `🎉 按计划完成${phase.name}任务 +500分`;
+        content.innerHTML = `<div style="color:#16a34a;font-size:13px;">✅ 第${status.weekNum}周，可以提交任务啦！</div>`;
+    } else {
+        btn.disabled = true;
+        btn.textContent = `⏳ 第${status.weekNum}周，第${phase.unlockWeek}周起可提交`;
+        content.innerHTML = `<div style="color:#d97706;font-size:13px;">🌱 当前第${status.weekNum}周，再坚持${phase.unlockWeek - status.weekNum}周就可以提交啦！</div>`;
+    }
+    result.classList.remove('show');
+}
+
+function completeMission() {
+    const phase = getCurrentPhase();
+    if (isMissionCompleted(phase.id)) { alert('该阶段任务已完成！'); return; }
+    const now = new Date();
+    const end = parseDate(phase.end);
+    end.setHours(23,59,59,999);
+    let overdue = 0, score = 500;
+    if (now > end) { overdue = daysBetween(end, now); score = Math.max(0, 500 - overdue * 20); }
+    const confirmMsg = overdue > 0 ? `阶段已超期${overdue}天，将获得 ${score} 分（扣${overdue*20}分）\n确认提交？` : `按时完成！获得 500 分\n确认提交？`;
+    if (!confirm(confirmMsg)) return;
+    data.completedMissions[phase.id] = { date: today, score: score, overdue: overdue, phaseName: phase.name };
+    data.totalScore += score;
+    saveData(); updateScores(); updatePhaseDisplay();
+    alert(`🎉 ${phase.name}完成！\n获得 +${score} 分${overdue > 0 ? '（超期扣' + (overdue*20) + '分）' : ''}`);
 }
 
 function updateDate() {
     const d = new Date();
     const weekdays = ['日','一','二','三','四','五','六'];
-    document.getElementById('dateDisplay').textContent = 
-        d.getFullYear() + '年' + (d.getMonth()+1) + '月' + d.getDate() + '日 星期' + weekdays[d.getDay()];
+    document.getElementById('dateDisplay').textContent = d.getFullYear() + '年' + (d.getMonth()+1) + '月' + d.getDate() + '日 星期' + weekdays[d.getDay()];
 }
 
-// 点击打卡项
 document.querySelectorAll('.item').forEach(item => {
     if (item.id === 'studyItem') return;
-
     item.addEventListener('click', function(e) {
         if (e.target.classList.contains('hour-btn')) return;
-
         const isChecked = this.classList.contains('checked');
         const score = parseInt(this.dataset.score);
-        const type = this.dataset.type;
         const itemText = this.querySelector('.item-text').textContent;
-
-        if (isChecked) {
-            this.classList.remove('checked');
-            delete data.records[today].items[itemText];
-        } else {
-            this.classList.add('checked');
-            data.records[today].items[itemText] = score;
-        }
-
-        saveData();
-        updateScores();
+        if (isChecked) { this.classList.remove('checked'); delete data.records[today].items[itemText]; }
+        else { this.classList.add('checked'); data.records[today].items[itemText] = score; }
+        saveData(); updateScores();
     });
 });
 
-// 学习时长按钮
 document.querySelectorAll('.hour-btn').forEach(btn => {
     btn.addEventListener('click', function(e) {
         e.stopPropagation();
         const hours = parseInt(this.dataset.hours);
         const score = parseInt(this.dataset.score);
-
         document.querySelectorAll('.hour-btn').forEach(b => b.classList.remove('active'));
         this.classList.add('active');
-
         data.records[today].studyHours = hours;
         data.records[today].studyScore = score;
-
         const studyItem = document.getElementById('studyItem');
         studyItem.classList.add('checked');
         studyItem.dataset.score = score;
-
-        saveData();
-        updateScores();
+        saveData(); updateScores();
     });
 });
 
 function updateScores() {
     const record = data.records[today];
     let todayScore = 0;
-    let todayPenalty = 0;
-    let todayOffset = 0;
-
-    // 计算今日得分（只算加分项）
     for (let key in record.items) {
         const score = record.items[key];
-        if (score > 0 && key !== '打扫全屋一次' && key !== '连续三天独立做饭+刷碗') {
-            todayScore += score;
-        }
+        if (score > 0 && key !== '打扫全屋一次' && key !== '连续三天独立做饭+刷碗') todayScore += score;
     }
     todayScore += record.studyScore || 0;
 
-    // 计算惩罚分（独立累计）
-    for (let key in record.items) {
-        const score = record.items[key];
-        if (score < 0) {
-            todayPenalty += Math.abs(score); // 惩罚分记正数
-        }
-    }
-
-    // 计算抵消分
-    for (let key in record.items) {
-        const score = record.items[key];
-        if (key === '打扫全屋一次' || key === '连续三天独立做饭+刷碗') {
-            todayOffset += score;
-        }
-    }
-
-    // 重新计算总积分（只含加分项）
     let total = 0;
     for (let date in data.records) {
         const r = data.records[date];
-        for (let key in r.items) {
-            const s = r.items[key];
-            if (s > 0 && key !== '打扫全屋一次' && key !== '连续三天独立做饭+刷碗') {
-                total += s;
-            }
-        }
+        for (let key in r.items) { const s = r.items[key]; if (s > 0 && key !== '打扫全屋一次' && key !== '连续三天独立做饭+刷碗') total += s; }
         total += r.studyScore || 0;
     }
+    for (let phaseId in data.completedMissions) total += data.completedMissions[phaseId].score;
     data.totalScore = total;
 
-    // 计算总惩罚分（独立累计，不抵消）
     let totalPenalty = 0;
     for (let date in data.records) {
         const r = data.records[date];
-        for (let key in r.items) {
-            const s = r.items[key];
-            if (s < 0) totalPenalty += Math.abs(s);
-        }
+        for (let key in r.items) { const s = r.items[key]; if (s < 0) totalPenalty += Math.abs(s); }
     }
     data.penaltyScore = totalPenalty;
 
-    // 计算本周和本月（只含加分项）
-    let weekTotal = 0;
-    let monthTotal = 0;
+    let weekTotal = 0, monthTotal = 0;
     for (let date in data.records) {
         const r = data.records[date];
         let dayScore = 0;
-        for (let key in r.items) {
-            const s = r.items[key];
-            if (s > 0 && key !== '打扫全屋一次' && key !== '连续三天独立做饭+刷碗') {
-                dayScore += s;
-            }
-        }
+        for (let key in r.items) { const s = r.items[key]; if (s > 0 && key !== '打扫全屋一次' && key !== '连续三天独立做饭+刷碗') dayScore += s; }
         dayScore += r.studyScore || 0;
-
         if (date >= currentWeek) weekTotal += dayScore;
         if (date.startsWith(currentMonth)) monthTotal += dayScore;
     }
     data.weekScores[currentWeek] = weekTotal;
     data.monthScores[currentMonth] = monthTotal;
 
-    // 更新显示
     document.getElementById('todayScore').textContent = todayScore;
     document.getElementById('weekScore').textContent = weekTotal;
     document.getElementById('monthScore').textContent = monthTotal;
     document.getElementById('totalScore').textContent = total;
     document.getElementById('penaltyScore').textContent = totalPenalty;
-
     saveData();
 }
 
-function saveData() {
-    localStorage.setItem('scoreData', JSON.stringify(data));
-}
+function saveData() { localStorage.setItem('scoreData', JSON.stringify(data)); }
 
 function loadData() {
     const record = data.records[today] || { items: {}, studyHours: 0, studyScore: 0 };
-
     document.querySelectorAll('.item').forEach(item => {
         if (item.id === 'studyItem') {
             if (record.studyHours) {
                 document.querySelectorAll('.hour-btn').forEach(btn => {
                     if (parseInt(btn.dataset.hours) === record.studyHours) {
-                        btn.classList.add('active');
-                        item.classList.add('checked');
-                        item.dataset.score = record.studyScore;
+                        btn.classList.add('active'); item.classList.add('checked'); item.dataset.score = record.studyScore;
                     }
                 });
             }
             return;
         }
-
         const itemText = item.querySelector('.item-text').textContent;
-        if (record.items[itemText] !== undefined) {
-            item.classList.add('checked');
-        }
+        if (record.items[itemText] !== undefined) item.classList.add('checked');
     });
-
     updateScores();
 }
 
 function resetDay() {
     if (!confirm('确定要重置今日所有打卡吗？')) return;
-
     data.records[today] = { items: {}, studyHours: 0, studyScore: 0 };
-
-    document.querySelectorAll('.item').forEach(item => {
-        item.classList.remove('checked');
-    });
-    document.querySelectorAll('.hour-btn').forEach(btn => {
-        btn.classList.remove('active');
-    });
-
-    saveData();
-    updateScores();
+    document.querySelectorAll('.item').forEach(item => item.classList.remove('checked'));
+    document.querySelectorAll('.hour-btn').forEach(btn => btn.classList.remove('active'));
+    saveData(); updateScores();
 }
 
 function copyReport() {
     const record = data.records[today];
-    let report = `📅 ${today} 打卡汇报\n\n`;
+    const phase = getCurrentPhase();
+    const status = getPhaseStatus(phase);
+    let report = `📅 ${today} 打卡汇报\n📍 ${phase.name}：${phase.task}（${status.text}）\n\n`;
 
     report += `【每日加分】\n`;
     const dailyItems = ['早上9:00前起床，10:00到办公室', '晚上12:30前睡觉', '三餐按时吃（晚餐<9:00pm）', '每日记录、复盘', '每日运动15-20分钟', '睡前泡脚、护肤、刷牙后不吃'];
@@ -642,11 +893,8 @@ function copyReport() {
         const checked = record.items[text] !== undefined;
         report += `${checked ? '✅' : '⬜'} ${text} ${checked ? '+' + record.items[text] : ''}\n`;
     });
-    if (record.studyHours) {
-        report += `✅ 每日学习时长 ${record.studyHours}h +${record.studyScore}\n`;
-    } else {
-        report += `⬜ 每日学习时长\n`;
-    }
+    if (record.studyHours) report += `✅ 每日学习时长 ${record.studyHours}h +${record.studyScore}\n`;
+    else report += `⬜ 每日学习时长\n`;
 
     report += `\n【每周加分】\n`;
     const weeklyItems = ['论文有进展（小论文一章/大论文2小节）', '数模、机器学习有进展（跑通/跑顺）', '连续5天学习', '连续5天早睡早起'];
@@ -669,33 +917,21 @@ function copyReport() {
         report += `${checked ? '✅' : '⬜'} ${text} ${checked ? '+' + record.items[text] : ''}\n`;
     });
 
-    const todayScore = document.getElementById('todayScore').textContent;
-    const weekScore = document.getElementById('weekScore').textContent;
-    const monthScore = document.getElementById('monthScore').textContent;
-    const totalScore = document.getElementById('totalScore').textContent;
-    const penaltyScore = document.getElementById('penaltyScore').textContent;
+    report += `\n📊 当日得分：${document.getElementById('todayScore').textContent}\n`;
+    report += `📊 本周累计：${document.getElementById('weekScore').textContent}\n`;
+    report += `📊 本月累计：${document.getElementById('monthScore').textContent}\n`;
+    report += `🏆 总累计积分：${document.getElementById('totalScore').textContent}\n`;
+    report += `⚠️ 累计惩罚分：${document.getElementById('penaltyScore').textContent}\n`;
+    if (data.completedMissions[phase.id]) report += `🎉 ${phase.name}已完成：+${data.completedMissions[phase.id].score}分\n`;
 
-    report += `\n📊 当日得分：${todayScore}\n`;
-    report += `📊 本周累计：${weekScore}\n`;
-    report += `📊 本月累计：${monthScore}\n`;
-    report += `📊 总累计积分：${totalScore}\n`;
-    report += `⚠️ 累计惩罚分：${penaltyScore}\n`;
-
-    navigator.clipboard.writeText(report).then(() => {
-        alert('已复制到剪贴板！可以直接粘贴给我啦~');
-    }).catch(() => {
-        const textarea = document.createElement('textarea');
-        textarea.value = report;
-        document.body.appendChild(textarea);
-        textarea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textarea);
+    navigator.clipboard.writeText(report).then(() => alert('已复制到剪贴板！可以直接粘贴给我啦~')).catch(() => {
+        const textarea = document.createElement('textarea'); textarea.value = report;
+        document.body.appendChild(textarea); textarea.select(); document.execCommand('copy'); document.body.removeChild(textarea);
         alert('已复制到剪贴板！');
     });
 }
 
-updateDate();
-loadData();
+updateDate(); updatePhaseDisplay(); loadData();
 </script>
 </body>
 </html>
